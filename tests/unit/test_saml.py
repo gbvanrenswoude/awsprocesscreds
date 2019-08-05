@@ -423,8 +423,8 @@ class TestADFSAuthenticator(object):
         }
         assert not adfs_auth.is_suitable(config)
 
-    def test_uses_adfs_fields(self, adfs_auth, mock_requests_session,
-                              adfs_config):
+    def test_uses_adfs_fields_newer(self, adfs_auth, mock_requests_session,
+                                    adfs_config):
         adfs_login_form = (
             '<html>'
             '<form action="login">'
@@ -451,6 +451,37 @@ class TestADFSAuthenticator(object):
             data={
                 'ctl00$ContentPlaceHolder1$UsernameTextBox': 'monty',
                 'ctl00$ContentPlaceHolder1$PasswordTextBox': 'mypassword'
+            }
+        )
+
+    def test_uses_adfs_fields_older(self, adfs_auth, mock_requests_session,
+                                    adfs_config):
+        adfs_login_form = (
+            '<html>'
+            '<form action="login">'
+            '<input name="UserName"/>'
+            '<input name="Password"/>'
+            '</form>'
+            '</html>'
+        )
+        mock_requests_session.get.return_value = mock.Mock(
+            spec=requests.Response, status_code=200, text=adfs_login_form
+        )
+        mock_requests_session.post.return_value = mock.Mock(
+            spec=requests.Response, status_code=200, text=(
+                '<form><input name="SAMLResponse" '
+                'value="fakeassertion"/></form>'
+            )
+        )
+
+        saml_assertion = adfs_auth.retrieve_saml_assertion(adfs_config)
+        assert saml_assertion == 'fakeassertion'
+
+        mock_requests_session.post.assert_called_with(
+            "https://example.com/login", verify=True,
+            data={
+                'UserName': 'monty',
+                'Password': 'mypassword'
             }
         )
 

@@ -175,13 +175,17 @@ class GenericFormsBasedAuthenticator(SAMLAuthenticator):
 
     def _fill_in_form_values(self, config, form_data):
         username = config['saml_username']
-        username_field = set(self.USERNAME_FIELDS).intersection(form_data.keys())
+        username_field = set(self.USERNAME_FIELDS).intersection(
+            form_data.keys()
+        )
         if not username_field:
             raise SAMLError(
                 self._ERROR_MISSING_FORM_FIELD % self.USERNAME_FIELDS)
-        else:
-            form_data[username_field.pop()] = username
-        password_field = set(self.PASSWORD_FIELDS).intersection(form_data.keys())
+        form_data[username_field.pop()] = username
+
+        password_field = set(self.PASSWORD_FIELDS).intersection(
+            form_data.keys()
+        )
         if password_field:
             form_data[password_field.pop()] = self._password_prompter(
                 "Password: ")
@@ -252,17 +256,27 @@ class OktaAuthenticator(GenericFormsBasedAuthenticator):
         return r
 
     def is_suitable(self, config):
-        return (config.get('saml_authentication_type') == 'form' and
-                config.get('saml_provider') == 'okta')
+        return (
+            config.get('saml_authentication_type') == 'form'
+            and config.get('saml_provider') == 'okta'
+        )
 
 
 class ADFSFormsBasedAuthenticator(GenericFormsBasedAuthenticator):
-    USERNAME_FIELDS = ('ctl00$ContentPlaceHolder1$UsernameTextBox', 'UserName',)
-    PASSWORD_FIELDS = ('ctl00$ContentPlaceHolder1$PasswordTextBox', 'Password',)
+    USERNAME_FIELDS = (
+        'ctl00$ContentPlaceHolder1$UsernameTextBox',
+        'UserName',
+    )
+    PASSWORD_FIELDS = (
+        'ctl00$ContentPlaceHolder1$PasswordTextBox',
+        'Password',
+    )
 
     def is_suitable(self, config):
-        return (config.get('saml_authentication_type') == 'form' and
-                config.get('saml_provider') == 'adfs')
+        return (
+            config.get('saml_authentication_type') == 'form'
+            and config.get('saml_provider') == 'adfs'
+        )
 
 
 class FormParser(six.moves.html_parser.HTMLParser):
