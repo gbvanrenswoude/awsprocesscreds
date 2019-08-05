@@ -57,8 +57,8 @@ class SAMLAuthenticator(object):
 
 
 class GenericFormsBasedAuthenticator(SAMLAuthenticator):
-    USERNAME_FIELD = 'username'
-    PASSWORD_FIELD = 'password'
+    USERNAME_FIELDS = ('username',)
+    PASSWORD_FIELDS = ('password',)
 
     _ERROR_BAD_RESPONSE = (
         'Received a non-200 response (%s) when making a request to: %s'
@@ -175,13 +175,15 @@ class GenericFormsBasedAuthenticator(SAMLAuthenticator):
 
     def _fill_in_form_values(self, config, form_data):
         username = config['saml_username']
-        if self.USERNAME_FIELD not in form_data:
+        username_field = set(self.USERNAME_FIELDS).intersection(form_data.keys())
+        if not username_field:
             raise SAMLError(
-                self._ERROR_MISSING_FORM_FIELD % self.USERNAME_FIELD)
+                self._ERROR_MISSING_FORM_FIELD % self.USERNAME_FIELDS)
         else:
-            form_data[self.USERNAME_FIELD] = username
-        if self.PASSWORD_FIELD in form_data:
-            form_data[self.PASSWORD_FIELD] = self._password_prompter(
+            form_data[username_field.pop()] = username
+        password_field = set(self.PASSWORD_FIELDS).intersection(form_data.keys())
+        if password_field:
+            form_data[password_field.pop()] = self._password_prompter(
                 "Password: ")
 
     def _send_form_post(self, login_url, form_data):
@@ -255,8 +257,8 @@ class OktaAuthenticator(GenericFormsBasedAuthenticator):
 
 
 class ADFSFormsBasedAuthenticator(GenericFormsBasedAuthenticator):
-    USERNAME_FIELD = 'ctl00$ContentPlaceHolder1$UsernameTextBox'
-    PASSWORD_FIELD = 'ctl00$ContentPlaceHolder1$PasswordTextBox'
+    USERNAME_FIELDS = ('ctl00$ContentPlaceHolder1$UsernameTextBox', 'UserName',)
+    PASSWORD_FIELDS = ('ctl00$ContentPlaceHolder1$PasswordTextBox', 'Password',)
 
     def is_suitable(self, config):
         return (config.get('saml_authentication_type') == 'form' and
