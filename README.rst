@@ -11,13 +11,15 @@ and related tools.
 This is an experimental package, breaking changes may occur on any minor
 version bump.
 
+This package supports multiple HTML Forms, so older ADFS setups are supported as well.
+
 
 Installation
 ------------
 
 The easiest way to install is to use pip::
 
-    pip install awsprocesscreds
+    pip install mnawsprocesscreds
 
 Requirements
 ~~~~~~~~~~~~
