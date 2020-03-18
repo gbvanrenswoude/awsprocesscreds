@@ -28,19 +28,19 @@ install_requires = [
 ]
 
 setup(
-    name='awsprocesscreds',
+    name='mnawsprocesscreds',
     version=find_version('awsprocesscreds', '__init__.py'),
     description='AWS Process Credential Providers.',
     long_description=read('README.rst'),
     author='Amazon Web Services',
-    url='https://github.com/awslabs/awsprocesscreds',
+    url='https://github.com/gbvanrenswoude/awsprocesscreds',
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
     license='Apache License 2.0',
     keywords='aws credentials',
     entry_points={
         'console_scripts': [
-            'awsprocesscreds-saml = awsprocesscreds.cli:saml'
+            'mnawsprocesscreds-saml = awsprocesscreds.cli:saml'
         ]
     },
     classifiers=(
